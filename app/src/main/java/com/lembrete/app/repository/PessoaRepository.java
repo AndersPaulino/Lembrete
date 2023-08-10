@@ -16,6 +16,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa , Long> {
     public List<Pessoa> findByName(@Param("nome")final String nome);
 
     @Query("From Lembrete where ativo = :ativo")
-    public List<Lembrete> findByAtivo(@Param("Ativo")final boolean ativo);
+    public List<Pessoa> findByAtivo(@Param("Ativo")final boolean ativo);
 
 }

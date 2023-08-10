@@ -18,4 +18,22 @@ public class Pessoa extends AbstractEntity{
     @JoinColumn(name = "cl_lembretes")
     private List<Lembrete> lembreteList;
 
+    public Pessoa() {
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public List<Lembrete> getLembreteList(){
+        return lembreteList;
+    }
+
+    public void setLembreteList(List<Lembrete> lembreteList) {
+        this.lembreteList = lembreteList;
+    }
 }
