@@ -50,6 +50,7 @@ public class LembreteService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void excluir(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("ID do lembrete é nulo.");

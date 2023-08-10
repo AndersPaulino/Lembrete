@@ -1,5 +1,6 @@
 package com.lembrete.app.service;
 
+import com.lembrete.app.entity.Lembrete;
 import com.lembrete.app.entity.Pessoa;
 import com.lembrete.app.repository.PessoaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,14 @@ public class PessoaService {
         } else {
             throw new IllegalArgumentException("Id inválido!");
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void excluir(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID do lembrete é nulo.");
+        }
+        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lembrete não encontrado com o ID: " + id));
+        pessoaRepository.deleteById(id);
     }
 }
