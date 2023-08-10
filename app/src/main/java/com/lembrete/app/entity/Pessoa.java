@@ -14,8 +14,8 @@ public class Pessoa extends AbstractEntity{
     private String nome;
 
     @Getter @Setter
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "cl_lembretes")
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cl_lembrete_id")
     private List<Lembrete> lembreteList;
 
     public Pessoa() {

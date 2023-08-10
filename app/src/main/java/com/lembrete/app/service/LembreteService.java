@@ -49,4 +49,12 @@ public class LembreteService {
             throw new IllegalArgumentException("Id inválido!");
         }
     }
+
+    public void excluir(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID do lembrete é nulo.");
+        }
+        Lembrete lembrete = lembreteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lembrete não encontrado com o ID: " + id));
+        lembreteRepository.deleteById(id);
+    }
 }
