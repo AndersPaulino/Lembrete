@@ -87,7 +87,7 @@ Exclui um lembrete pelo ID fornecido.
 
 ```yaml
 {
-"descricao": "Texto do lembrete"
+      "descricao": "Texto do lembrete"
 }
 ```
 
@@ -95,18 +95,18 @@ Exclui um lembrete pelo ID fornecido.
 
 ```yaml
 {
-"nome": "Nome da pessoa",
-"lembreteList": [
-      {
-          "id": 1
-      },
-      {
-          "id": 2
-      },
-      {
-          "id": 3
-      }
-    ]
+      "nome": "Nome da pessoa",
+      "lembreteList": [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            }
+      ]
 }
 ```
-[Inicio](#aplicaçao-de-gerenciamento-de-lembretes)
+[Inicio](#aplicação-de-gerenciamento-de-lembretes)
