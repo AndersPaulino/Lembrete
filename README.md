@@ -8,7 +8,7 @@ Esta é uma aplicação de gerenciamento de lembretes que oferece endpoints para
 
 #### Recuperar uma pessoa por ID
 
-<span style="color:green;">GET</span> `/api/pessoa/{id}`
+GET `/api/pessoa/{id}`
 
 Retorna os detalhes de uma pessoa pelo ID fornecido.
 
