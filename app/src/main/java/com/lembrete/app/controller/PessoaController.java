@@ -1,8 +1,6 @@
 package com.lembrete.app.controller;
 
-import com.lembrete.app.entity.Lembrete;
 import com.lembrete.app.entity.Pessoa;
-import com.lembrete.app.repository.PessoaRepository;
 import com.lembrete.app.service.PessoaService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,61 +16,46 @@ import java.util.Optional;
 @RequestMapping("/api/pessoa")
 public class PessoaController {
 
-    private PessoaRepository pessoaRepository;
-
-    private PessoaService pessoaService;
+    private final PessoaService pessoaService;
 
     @Autowired
-    public PessoaController(PessoaRepository pessoaRepository, PessoaService pessoaService){
-        this.pessoaRepository = pessoaRepository;
+    public PessoaController(PessoaService pessoaService) {
         this.pessoaService = pessoaService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pessoa> findById(@PathVariable Long id) {
-        Optional<Pessoa> pessoa = pessoaRepository.findById(id);
-        if (pessoa.isPresent()) {
-            return ResponseEntity.ok().body(pessoa.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Pessoa> getPessoa(@PathVariable Long id) {
+        Optional<Pessoa> pessoa = pessoaService.findById(id);
+        return pessoa.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/ativo/{ativo}")
-    public ResponseEntity<List<Pessoa>> findByAtivo(@PathVariable boolean ativo) {
-        List<Pessoa> pessoasAtivos = pessoaRepository.findByAtivo(ativo);
-        if (!pessoasAtivos.isEmpty()) {
-            return ResponseEntity.ok(pessoasAtivos);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<List<Pessoa>> getPessoasByAtivo(@PathVariable boolean ativo) {
+        List<Pessoa> pessoasAtivos = pessoaService.findByAtivo(ativo);
+        return ResponseEntity.ok(pessoasAtivos);
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(){
-        List<Pessoa> pessoas = pessoaRepository.findAll();
-        if (pessoas.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.ok().body(pessoas);
-        }
+    public ResponseEntity<List<Pessoa>> getAllPessoas() {
+        List<Pessoa> pessoas = pessoaService.findAll();
+        return pessoas.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(pessoas);
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Pessoa pessoa) {
+    public ResponseEntity<String> cadastrarPessoa(@RequestBody Pessoa pessoa) {
         try {
             pessoaService.cadastrar(pessoa);
-            return ResponseEntity.ok().body("Registro cadastrado com sucesso!");
+            return ResponseEntity.ok("Registro cadastrado com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable @NotNull Long id, @RequestBody Pessoa pessoa) {
+    public ResponseEntity<String> atualizarPessoa(@PathVariable @NotNull Long id, @RequestBody Pessoa pessoa) {
         try {
             pessoaService.atualizar(id, pessoa);
-            return ResponseEntity.ok().body("Registro atualizado com sucesso!");
+            return ResponseEntity.ok("Registro atualizado com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -81,14 +64,14 @@ public class PessoaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirLembrete(@PathVariable @NotNull Long id) {
+    public ResponseEntity<String> excluirPessoa(@PathVariable @NotNull Long id) {
         try {
             pessoaService.excluir(id);
-            return ResponseEntity.ok().body("Lembrete excluído com sucesso!");
+            return ResponseEntity.ok("Pessoa excluída com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao excluir o lembrete.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao excluir a pessoa.");
         }
     }
 }

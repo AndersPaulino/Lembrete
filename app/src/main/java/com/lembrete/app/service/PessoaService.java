@@ -17,56 +17,47 @@ public class PessoaService {
     private final PessoaRepository pessoaRepository;
 
     @Autowired
-    public PessoaService(PessoaRepository pessoaRepository){
+    public PessoaService(PessoaRepository pessoaRepository) {
         this.pessoaRepository = pessoaRepository;
     }
 
-    public List<Pessoa> findByName(String nome){
+    public List<Pessoa> findByName(String nome) {
         return pessoaRepository.findByName(nome);
     }
 
-    Optional<Pessoa> findById(Long id){
+    public Optional<Pessoa> findById(Long id) {
         return pessoaRepository.findById(id);
     }
 
-    public List<Pessoa> findByAtivo(boolean ativo){
+    public List<Pessoa> findByAtivo(boolean ativo) {
         return pessoaRepository.findByAtivo(ativo);
     }
 
-    public List<Pessoa> findAll(){
+    public List<Pessoa> findAll() {
         return pessoaRepository.findAll();
     }
 
-    public void validarPessoa(final Pessoa pessoa){
-        if (!pessoa.getNome().matches("[a-zA-Z ]+")) {
-            throw new IllegalArgumentException("Nome do fornecedor inválido");
+    private void validarNome(String nome) {
+        if (nome == null || !nome.matches("[a-zA-Z ]+")) {
+            throw new IllegalArgumentException("Nome da pessoa inválido");
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void cadastrar(Pessoa pessoa) {
-        validarPessoa(pessoa);
+        validarNome(pessoa.getNome());
         pessoaRepository.save(pessoa);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void atualizar(Long id, Pessoa pessoa) {
-        validarPessoa(pessoa);
+        validarNome(pessoa.getNome());
 
         Optional<Pessoa> pessoaExistente = pessoaRepository.findById(id);
 
         if (pessoaExistente.isPresent()) {
-            Pessoa pessoaAtualizado = pessoaExistente.get();
-
-            if (pessoa.getNome() != null) {
-                pessoaAtualizado.setNome(pessoa.getNome());
-            }
-
-            if (pessoa.getLembreteList() != null){
-                pessoaAtualizado.setLembreteList(pessoa.getLembreteList());
-            }
-
-            pessoaRepository.save(pessoaAtualizado);
+            Pessoa pessoaAtualizada = pessoaExistente.get();
+            pessoaRepository.save(pessoaAtualizada);
         } else {
             throw new IllegalArgumentException("Id inválido!");
         }
@@ -75,9 +66,14 @@ public class PessoaService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void excluir(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("ID do lembrete é nulo.");
+            throw new IllegalArgumentException("ID da pessoa é nulo.");
         }
-        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lembrete não encontrado com o ID: " + id));
+        Pessoa pessoa = pessoaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Pessoa não encontrada com o ID: " + id));
+
+        if (!pessoa.getLembreteList().isEmpty()) {
+            throw new IllegalStateException("A pessoa não pode ser excluída porque está vinculada a lembretes.");
+        }
+
         pessoaRepository.deleteById(id);
     }
 }

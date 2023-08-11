@@ -1,7 +1,6 @@
 package com.lembrete.app.controller;
 
 import com.lembrete.app.entity.Lembrete;
-import com.lembrete.app.repository.LembreteRepository;
 import com.lembrete.app.service.LembreteService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,84 +10,70 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/lembrete")
 public class LembreteController {
 
-    private LembreteRepository lembreteRepository;
-
-    private LembreteService lembreteService;
+    private final LembreteService lembreteService;
 
     @Autowired
-    public LembreteController(LembreteRepository lembreteRepository, LembreteService lembreteService){
-        this.lembreteRepository = lembreteRepository;
+    public LembreteController(LembreteService lembreteService) {
         this.lembreteService = lembreteService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lembrete> findById(@PathVariable Long id) {
-        Optional<Lembrete> lembrete = lembreteRepository.findById(id);
-        if (lembrete.isPresent()) {
-            return ResponseEntity.ok().body(lembrete.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Lembrete> getLembrete(@PathVariable Long id) {
+        return lembreteService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/ativo/{ativo}")
-    public ResponseEntity<List<Lembrete>> findByAtivo(@PathVariable boolean ativo) {
-        List<Lembrete> lembretesAtivos = lembreteRepository.findByAtivo(ativo);
-        if (!lembretesAtivos.isEmpty()) {
-            return ResponseEntity.ok(lembretesAtivos);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<List<Lembrete>> getLembretesByAtivo(@PathVariable boolean ativo) {
+        List<Lembrete> lembretesAtivos = lembreteService.findByAtivo(ativo);
+        return lembretesAtivos.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(lembretesAtivos);
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(){
-        List<Lembrete> lembreteList = lembreteRepository.findAll();
-        if (lembreteList.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.ok().body(lembreteList);
-        }
+    public ResponseEntity<List<Lembrete>> getAllLembretes() {
+        List<Lembrete> lembreteList = lembreteService.findAll();
+        return lembreteList.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(lembreteList);
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Lembrete lembrete) {
+    public ResponseEntity<String> cadastrarLembrete(@RequestBody Lembrete lembrete) {
         try {
             lembreteService.cadastrar(lembrete);
-            return ResponseEntity.ok().body("Registro cadastrado com sucesso!");
+            return ResponseEntity.ok("Lembrete cadastrado com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao cadastrar o lembrete.");
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable @NotNull Long id, @RequestBody Lembrete lembrete) {
+    public ResponseEntity<String> atualizarLembrete(@PathVariable @NotNull Long id, @RequestBody Lembrete lembrete) {
         try {
             lembreteService.atualizar(id, lembrete);
-            return ResponseEntity.ok().body("Registro atualizado com sucesso!");
+            return ResponseEntity.ok("Lembrete atualizado com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o registro.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o lembrete.");
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluirLembrete(@PathVariable @NotNull Long id) {
+    public ResponseEntity<String> excluirLembrete(@PathVariable @NotNull Long id) {
         try {
             lembreteService.excluir(id);
-            return ResponseEntity.ok().body("Lembrete excluído com sucesso!");
+            return ResponseEntity.ok("Lembrete excluído com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao excluir o lembrete.");
         }
     }
-
 }
