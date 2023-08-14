@@ -116,18 +116,15 @@ Exclui um lembrete pelo ID fornecido.
 
 ```yaml
 {
-      "nome": "Nome da pessoa",
-      "lembreteList": [
-            {
-                "id": 1
-            },
-            {
-                "id": 2
-            },
-            {
-                "id": 3
-            }
-      ]
+    "nome": "nome da pessoa",
+    "lembreteList": [
+        {
+            "descricao": "lembrete 3"
+        },
+        {
+            "descricao": "lembrete 4"
+        }
+    ]
 }
 ```
 [Inicio](#aplicação-de-gerenciamento-de-lembretes)<br>
