@@ -51,8 +51,18 @@ public class PessoaController {
         }
     }
 
+    @PostMapping("/com-lembretes")
+    public ResponseEntity<String> cadastrarPessoaComLembretes(@RequestBody Pessoa pessoa) {
+        try {
+            pessoaService.cadastrarComLembretes(pessoa);
+            return ResponseEntity.ok("Registro cadastrado com sucesso!");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarPessoa(@PathVariable @NotNull Long id, @RequestBody Pessoa pessoa) {
+    public ResponseEntity<String> atualizarPessoa(@PathVariable Long id, @RequestBody Pessoa pessoa) {
         try {
             pessoaService.atualizar(id, pessoa);
             return ResponseEntity.ok("Registro atualizado com sucesso!");
@@ -64,12 +74,14 @@ public class PessoaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> excluirPessoa(@PathVariable @NotNull Long id) {
+    public ResponseEntity<String> excluirPessoa(@PathVariable Long id) {
         try {
             pessoaService.excluir(id);
             return ResponseEntity.ok("Pessoa excluída com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao excluir a pessoa.");
         }

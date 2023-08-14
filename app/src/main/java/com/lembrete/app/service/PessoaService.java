@@ -43,6 +43,12 @@ public class PessoaService {
         }
     }
 
+    public void cadastrarComLembretes(Pessoa pessoa) {
+        validarNome(pessoa.getNome());
+        // Implemente a lógica para criar os lembretes com base nos IDs
+        pessoaRepository.save(pessoa);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void cadastrar(Pessoa pessoa) {
         validarNome(pessoa.getNome());
@@ -53,14 +59,13 @@ public class PessoaService {
     public void atualizar(Long id, Pessoa pessoa) {
         validarNome(pessoa.getNome());
 
-        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(id);
+        Pessoa pessoaExistente = pessoaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Id inválido!"));
 
-        if (pessoaExistente.isPresent()) {
-            Pessoa pessoaAtualizada = pessoaExistente.get();
-            pessoaRepository.save(pessoaAtualizada);
-        } else {
-            throw new IllegalArgumentException("Id inválido!");
-        }
+        // Atualize apenas o nome
+        pessoaExistente.setNome(pessoa.getNome());
+
+        pessoaRepository.save(pessoaExistente);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
