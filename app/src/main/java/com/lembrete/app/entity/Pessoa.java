@@ -25,24 +25,7 @@ public class Pessoa extends AbstractEntity{
     public Pessoa() {
     }
 
-    public Pessoa(String nome, List<Lembrete> lembreteList) {
+    public Pessoa(String nome) {
         this.nome = nome;
-        this.lembreteList = lembreteList;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public List<Lembrete> getLembreteList(){
-        return lembreteList;
-    }
-
-    public void setLembreteList(List<Lembrete> lembreteList) {
-        this.lembreteList = lembreteList;
     }
 }

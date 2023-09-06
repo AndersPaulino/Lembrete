@@ -2,6 +2,7 @@ package com.lembrete.app.controller;
 
 import com.lembrete.app.entity.Pessoa;
 import com.lembrete.app.service.PessoaService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,38 +39,32 @@ public class PessoaController {
     @GetMapping
     public ResponseEntity<List<Pessoa>> getAllPessoas() {
         List<Pessoa> pessoas = pessoaService.findAll();
-        return pessoas.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(pessoas);
+        if (pessoas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(pessoas);
     }
 
     @PostMapping
-    public ResponseEntity<String> cadastrarPessoa(@RequestBody Pessoa pessoa) {
+    public ResponseEntity<String> cadastrarPessoa(@RequestBody @Valid Pessoa pessoa) {
         try {
             pessoaService.cadastrar(pessoa);
-            return ResponseEntity.ok("Registro cadastrado com sucesso!");
+            String mensagemSucesso = "Pessoa cadastrada com sucesso: " + pessoa.getNome();
+            return ResponseEntity.ok(mensagemSucesso);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/com-lembretes")
-    public ResponseEntity<String> cadastrarPessoaComLembretes(@RequestBody Pessoa pessoa) {
-        try {
-            pessoaService.cadastrarComLembretes(pessoa);
-            return ResponseEntity.ok("Registro cadastrado com sucesso!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body("Erro ao cadastrar pessoa: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarPessoa(@PathVariable Long id, @RequestBody Pessoa pessoa) {
+    public ResponseEntity<String> atualizarPessoa(@PathVariable Long id, @RequestBody @Valid Pessoa pessoa) {
         try {
             pessoaService.atualizar(id, pessoa);
-            return ResponseEntity.ok("Registro atualizado com sucesso!");
+            return ResponseEntity.ok("Pessoa atualizada com sucesso!");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o registro.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar a pessoa.");
         }
     }
 
